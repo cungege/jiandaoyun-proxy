@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer agNBXmoph1oimHnUFMmQmhQ4xEhYOeYK7D8083eBfA5C302Aa038fDdCd5642Ab8'  // ← 已加入鉴权
+        'Authorization': 'Bearer agNBXmoph1oimHnUFMmQmhQ4xEhYOeYK7D8083eBfA5C302Aa038fDdCd5642Ab8'
       },
       body: JSON.stringify({
         appId: finalAppId,
@@ -32,10 +32,25 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    // 关键：无论简道云返回什么状态，都尝试解析 JSON
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      // 把简道云的真实错误返回给前端
+      return res.status(response.status).json({
+        error: 'JianDaoyun error',
+        status: response.status,
+        data: data
+      });
+    }
+
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error('Proxy fetch error:', error);
+    res.status(500).json({ 
+      error: 'fetch failed', 
+      message: error.message,
+      stack: error.stack 
+    });
   }
 }

@@ -23,21 +23,16 @@ export default async function handler(req, res) {
         'Authorization': 'Bearer agNBXmoph1oimHnUFMmQmhQ4xEhYOeYK7D8083eBfA5C302Aa038fDdCd5642Ab8'
       },
       body: JSON.stringify({
-        app_id: app_id,      // 使用 snake_case
-        entry_id: entry_id,  // 使用 snake_case
-        limit: 1             // 官方支持的参数
+        app_id: app_id,
+        entry_id: entry_id,
+        limit: 1
       })
     });
 
     const data = await response.json();
-
-    // 把简道云的真实返回（无论成功还是失败）都透传给前端
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy Error:', error);
-    res.status(500).json({ 
-      error: 'fetch failed', 
-      message: error.message 
-    });
+    console.error('Proxy fetch error:', error);
+    res.status(500).json({ error: 'fetch failed', message: error.message });
   }
 }

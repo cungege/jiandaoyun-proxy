@@ -7,26 +7,28 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const { app_id, entry_id } = req.body || {};
+  const { appId, entryId, app_id, entry_id } = req.body || {};
+  const finalAppId = appId || app_id;
+  const finalEntryId = entryId || entry_id;
 
-  if (!app_id || !entry_id) {
-    return res.status(400).json({ error: "缺少 app_id 或 entry_id" });
+  if (!finalAppId || !finalEntryId) {
+    return res.status(400).json({ error: "缺少 appId 或 entryId" });
   }
 
-  // v5 查询多条数据接口（获取最新1条）
   const jiandaoyunUrl = `https://api.jiandaoyun.com/api/v5/app/entry/data/list`;
 
   try {
     const response = await fetch(jiandaoyunUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer agNBXmoph1oimHnUFMmQmhQ4xEhYOeYK7D8083eBfA5C302Aa038fDdCd5642Ab8'  // ← 已加入鉴权
       },
       body: JSON.stringify({
-        app_id: app_id,
-        entry_id: entry_id,
-        limit: 1                    // 只取最新1条
-        // orderBy: "createTime desc" // v5 目前不支持此参数，如需严格最新可后续加 filter
+        appId: finalAppId,
+        entryId: finalEntryId,
+        limit: 1,
+        pageSize: 1
       })
     });
 

@@ -1,26 +1,30 @@
 export default async function handler(req, res) {
-  // 允许跨域（解决 GitHub Pages 的 CORS 问题）
+  // 允许跨域
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // 处理浏览器预检请求
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // 简道云 v2 接口地址
-  const jiandaoyunUrl = `https://api.jiandaoyun.com/api/v2/app/${req.body.app_id}/entry/${req.body.entry_id}/widgets`;
+  // 从前端拿到 app_id 和 entry_id，拼成完整地址
+  const { app_id, entry_id } = req.body;
+
+  if (!app_id || !entry_id) {
+    return res.status(400).json({ error: "app_id 和 entry_id 不能为空" });
+  }
+
+  const jiandaoyunUrl = `https://api.jiandaoyun.com/api/v2/app/${app_id}/entry/${entry_id}/widgets`;
 
   try {
     const response = await fetch(jiandaoyunUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        // 如果以后需要 Authorization，可以在这里添加
-        // 'Authorization': 'Bearer xxxxxx'
+        'Content-Type': 'application/json'
+        // 这个接口目前不需要 Authorization
       },
-      body: JSON.stringify({})   // 这个接口目前不需要传 body
+      body: JSON.stringify({})   // 关键：传空对象
     });
 
     const data = await response.json();

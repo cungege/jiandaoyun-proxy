@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const { action = "get_data", app_id, entry_id, data_list } = body;
 
-  // ==================== 写入：保存路线规划结果 ====================
+  // 写入功能
   if (action === "save_plan") {
     if (!data_list || !Array.isArray(data_list) || data_list.length === 0) {
       return res.status(400).json({ error: "data_list 不能为空" });
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, results });
   }
 
-  // ==================== 读取：获取简道云安装地址 ====================
+  // 读取功能
   if (!app_id || !entry_id) {
     return res.status(400).json({ error: "缺少 app_id 或 entry_id" });
   }
@@ -69,7 +69,6 @@ export default async function handler(req, res) {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy Error:', error);
     res.status(500).json({ error: 'fetch failed', message: error.message });
   }
 }
